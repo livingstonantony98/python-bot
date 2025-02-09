@@ -85,7 +85,6 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
     # if update.message.new_chat_members:
     # await update.message.reply_text("Image downloaded successfully!")
     now = datetime.datetime.now()
-    folder_name = 'test_folder'
     formatted_date = now.strftime("%Y-%m-%d %I-%M-%S-%f")[:-3] + " " + now.strftime("%p")
     # print(f'message type: {update}')
     if update.message.text:
@@ -97,13 +96,17 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
         print(f'username: {username}, name: {firstname} {lastname}, text: {text}')
 
     if update.message.photo:
+        folder_name = 'test_folder'
+
         message = await context.bot.send_message(chat_id=update.message.chat_id,
                                                  text=f'Uploading...', reply_to_message_id=update.message.message_id)
         file_name = f'{formatted_date}.jpg'
         img_path = f'{os.getcwd()}/leaked/images/{file_name}'
         caption = update.message.caption
         print(f'caption: {caption}')
-        print(f'File saved successfully!: {file_name}')
+        if caption=='hot_images':
+            folder_name=caption
+        print(f'File saved successfully!: {file_name}, folder_name ${folder_name}')
         await (await context.bot.getFile(update.message.photo[-1].file_id)).download_to_drive(img_path)
         mega_utils = MegaUtils()
         # mega_utils.upload(img_path,'leaked')
