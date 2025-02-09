@@ -11,38 +11,45 @@ from telegram.ext import ApplicationBuilder, CommandHandler, ContextTypes, Messa
 
 load_dotenv()
 API_KEY = os.getenv("KELLIE")
-FOLDER="images"
-
+FOLDER = "images"
 
 # Enter File/Folder Name
 from mega import Mega
 
 mega = Mega()
-m = mega.login(email, password)
-filename = "data.csv"
-m.upload(filename)
 
+KELLIE_USERNAME = os.getenv("KELLIE_USERNAME")
+KELLIE_PASSWORD = os.getenv("KELLIE_PASSWORD")
+
+m = mega.login(KELLIE_USERNAME, KELLIE_PASSWORD)
+filename = "data.csv"
+
+
+# m.upload(filename)
 
 
 async def hello(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     # await update.message.reply_text(f'Hello {update.effective_user.first_name}')
     await update.message.reply_text(f'Hello {update.effective_user.first_name}')
 
+
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    keyboard = [
-        [KeyboardButton("Actress"), KeyboardButton("Button 2")],
-        [KeyboardButton("Button 3")]
-    ]
+    buttons = ["Actress", "Button 2", "Button 3"]
+    # keyboard = [
+    #     [KeyboardButton("Actress"), KeyboardButton("Button 2")],
+    #     [KeyboardButton("Button 3")],
+    #     [KeyboardButton("Button 4")]
+    # ]
+    keyboard = [[KeyboardButton(button)] for button in buttons]
 
     reply_markup = ReplyKeyboardMarkup(keyboard, resize_keyboard=True)
 
     await context.bot.send_message(chat_id=update.effective_chat.id,
-                                      text="Select an option:",
-                                      reply_markup=reply_markup)
+                                   text="Select an option:",
+                                   reply_markup=reply_markup)
+
 
 async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-
-
     now = datetime.datetime.now()
     formatted_date = now.strftime("%Y-%m-%d %I-%M-%S-%f")[:-3] + " " + now.strftime("%p")
 
@@ -74,6 +81,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
     #     await update.message.reply_text("You selected Button 3!")
     # else:
     #     await update.message.reply_text("Invalid option. Please select again.")
+
 
 app = ApplicationBuilder().token(API_KEY).build()
 

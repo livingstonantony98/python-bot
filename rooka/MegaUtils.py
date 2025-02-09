@@ -1,3 +1,4 @@
+import random
 from fileinput import filename
 
 from mega import Mega
@@ -45,5 +46,37 @@ class MegaUtils:
     def is_folder_exist(self, folder_name):
         return self.m.find(folder_name) is not None
 
-    def get_list_of_folders(self):
-        self.m.get_files()
+    def get_random_image_from(self, folder_name):
+        # self.m.get_files()
+        # print(self.m.find('test_folder'))
+        # print(self.m.get_files_in_node('aE5CkIya').items())
+        folder = self.m.find(folder_name)[0]
+        files = self.m.get_files_in_node(folder)
+
+        print(len(files))
+
+        # for file in list(files.items()):
+        #     print(file)
+        #     n_value = file[1]['a']['n']
+        #     print(n_value)
+        #     link = self.m.get_link(file)
+        #     print(link)
+        #     self.download(link)
+
+        # time.sleep(1)
+
+        items = list(files.items())
+        print(len(items))
+        res = items[random.randint(0, len(items) - 1)]
+        print(res)
+        file = res
+        file_name = file[1]['a']['n']
+        print(file_name)
+        link = self.m.get_link(file)
+        print(link)
+        # self.download(link)
+        return file_name,link
+
+    def download(self, url):
+        self.m.download_url(url=url,
+                            dest_path="/Users/apple/Downloads/Learning Projects/Python/TelegramBot/TelegramBot/leaked/images")

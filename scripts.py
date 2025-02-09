@@ -33,4 +33,6 @@ mega_utils = MegaUtils()
 
 # print(mega_utils.is_folder_exist('tamana2'))
 
-mega_utils.get_list_of_folders()
+# mega_utils.get_random_image_from("hot_images")
+mega_utils.get_random_image_from("test_folder")
+# mega_utils.download("https://mega.co.nz/#!2UwlDBzY!it99T7HxNKC-KLgsVxkoQ6vfME_HlsgAAxGLIsxvm-c")
