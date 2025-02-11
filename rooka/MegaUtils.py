@@ -53,8 +53,6 @@ class MegaUtils:
         folder = self.m.find(folder_name)[0]
         files = self.m.get_files_in_node(folder)
 
-        print(len(files))
-
         # for file in list(files.items()):
         #     print(file)
         #     n_value = file[1]['a']['n']
