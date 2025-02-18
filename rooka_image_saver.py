@@ -3,16 +3,18 @@ import os
 from Crypto.SelfTest.Cipher.test_OFB import file_name
 # importing necessary functions from dotenv library
 from dotenv import load_dotenv
+from telegram import InputMediaPhoto, InputMediaVideo
 
 from Utils import Utils
 from rooka.MegaUtils import MegaUtils
 from scripts import mega_utils
+from src.utils.insta_post_downloader import InstaPostDownloader
 
 # loading variables from .env file
 load_dotenv()
 
-API_KEY = os.getenv("KELLIE")
-# API_KEY = os.getenv("ROOKA")
+# API_KEY = os.getenv("KELLIE")
+API_KEY = os.getenv("ROOKA")
 ROOKA_EMAIL = os.getenv("ROOKA_EMAIL")
 ROOKA_PASSWORD = os.getenv("ROOKA_PASSWORD")
 
@@ -32,7 +34,7 @@ utils = Utils()
 
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    buttons = ["hot_images","$Images"]
+    buttons = ["hot_images", "$Images"]
     # keyboard = [
     #     [KeyboardButton("Actress"), KeyboardButton("Button 2")],
     #     [KeyboardButton("Button 3")],
@@ -153,12 +155,51 @@ async def save_image_without_notifying_user(update: Update, context: ContextType
         # await (await context.bot.getFile(update.message.animation.file_id)).download_to_drive(file_path)
 
 
+async def insta_post_saver(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    now = datetime.datetime.now()
+    formatted_date = now.strftime("%Y-%m-%d %I-%M-%S-%f")[:-3] + " " + now.strftime("%p")
+    if update.message.text:
+        text = update.message.text
+        username = update.message.from_user.username
+        firstname = update.message.from_user.first_name
+        lastname = update.message.from_user.last_name
+        # phone_number = update.message.contact.phone_number
+        print(f'username: {username}, name: {firstname} {lastname}, text: {text}')
+
+        if "https://www.instagram.com" in text:
+            jpg_files, mp4_files = InstaPostDownloader().get_instagram_post(text)
+
+
+            if len(mp4_files) != 0:
+                print(f"mp4_files: {mp4_files}")
+
+                media = list(map(lambda file: InputMediaVideo(open(file, 'rb')), mp4_files))
+                await context.bot.send_media_group(chat_id=update.effective_chat.id,
+                                                   media=media,
+                                                   reply_to_message_id=update.message.message_id)
+            elif len(jpg_files) != 0:
+                print(f"jpg_files: {jpg_files}")
+                media = list(map(lambda file: InputMediaPhoto(open(file, 'rb')), jpg_files))
+                await context.bot.send_media_group(chat_id=update.effective_chat.id,
+                                                   media=media,
+                                                   reply_to_message_id=update.message.message_id)
+            else:
+                text = "Request failed. Make sure that account is not private. If it is public try again."
+                await context.bot.send_message(chat_id=update.effective_chat.id,
+                                               text=text,
+                                               reply_to_message_id=update.message.message_id)
+
+
 async def help_command(update, context):
     await context.bot.send_message(chat_id=update.effective_chat.id, text='I can understand /start and /help commands.')
 
 
+# number=1
 async def hot_images(update, context):
+    global number
     await utils.get_random_pic(update, context, mega_utils)
+    # number += 1
+    # await context.bot.send_message(chat_id=update.effective_chat.id, text=f'{number}')
 
 
 app = ApplicationBuilder().token(API_KEY).build()
@@ -167,12 +208,13 @@ start_handler = CommandHandler('start', start)
 help_handler = CommandHandler('help', help_command)
 hot_image_handler = CommandHandler('hot_image', hot_images)
 
-app.add_handler(start_handler)
-app.add_handler(help_handler)
-app.add_handler(hot_image_handler)
+# app.add_handler(start_handler)
+# app.add_handler(help_handler)
+# app.add_handler(hot_image_handler)
 
 # app.add_handler(MessageHandler(filters=None, callback=image_saver)) # upload images
 # app.add_handler(MessageHandler(filters=None, callback=save_image_without_notifying_user)) # upload images
-app.add_handler(MessageHandler(filters=None, callback=random_pic))
+# app.add_handler(MessageHandler(filters=None, callback=random_pic))
 # app.add_handler(message_handler)
+app.add_handler(MessageHandler(filters=None, callback=insta_post_saver))
 app.run_polling()

@@ -78,3 +78,36 @@ class MegaUtils:
     def download(self, url):
         self.m.download_url(url=url,
                             dest_path="/Users/apple/Downloads/Learning Projects/Python/TelegramBot/TelegramBot/leaked/images")
+
+    def pagingnation_image(self, folder_name):
+        # self.m.get_files()
+        # print(self.m.find('test_folder'))
+        # print(self.m.get_files_in_node('aE5CkIya').items())
+        folder = self.m.find(folder_name)[0]
+        files = self.m.get_files_in_node(folder)
+
+        # for file in list(files.items()):
+        #     print(file)
+        #     n_value = file[1]['a']['n']
+        #     print(n_value)
+        #     link = self.m.get_link(file)
+        #     print(link)
+        #     self.download(link)
+
+        # time.sleep(1)
+
+        items = list(files.items())
+        print(len(items))
+        res = items[random.randint(0, len(items) - 1)]
+        print(res)
+        file = res
+        file_name = file[1]['a']['n']
+        print(file_name)
+        link = self.m.get_link(file)
+        print(link)
+        # self.download(link)
+        return file_name, link
+
+    def download(self, url):
+        self.m.download_url(url=url,
+                            dest_path="/Users/apple/Downloads/Learning Projects/Python/TelegramBot/TelegramBot/leaked/images")
